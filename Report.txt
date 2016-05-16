@@ -1,0 +1,79 @@
+In the case of FCFS algorithm there are not too much to analyse outside of a comparison with the multilevel queue 
+because the behaviour is going to be the same with different parameters. It will starve process that come late if 
+there are a lot of process. The changing the memory will only change the usage percentage, because there is only 
+one process in memory at any time as they are removed when they finish.
+
+Now I'm going to concentrate in the analysis of the Multi-Level feedback queue. For this we are going to change the
+memory, the queue quantums and the processes. We will use basic examples to reflect the findings, however they have 
+been tested in further detail.
+
+Example:
+t pid mem  jt
+0  4   98   3 
+0  8  100   6
+10 2   33   1
+15 1   55  10
+20 3   60  15
+21 6   70  10
+22 9  100  10
+
+Snapshot Memory = 100
+numprocesses=1, numholes=1, memusage=70%
+numprocesses=1, numholes=0, memusage=100%
+numprocesses=1, numholes=1, memusage=60%
+numprocesses=1, numholes=0, memusage=100%
+
+Snapshot Memory = 500
+numprocesses=4, numholes=1, memusage=57%
+numprocesses=3, numholes=2, memusage=46%
+numprocesses=2, numholes=2, memusage=32%
+numprocesses=1, numholes=2, memusage=12%
+
+With low memory compared to the processes memory this algorithm work almost identical to the FCFS one in terms of 
+memory management, because I will only be able to hold one process at the time. However with more memory it won't 
+need to swap the processes that often because most of them will be there to start running again. But if a big 
+process needs to run when little processes are in memory it will have to remove most if not all of them to insert 
+the new process.
+
+For the quantums I will propose two cases, first when the quantums are larger than the current ones. 
+
+Example:
+t  pid jt
+0   4   3 
+0   8   6
+10  2   1
+15  1  10
+20  3  15
+21  6  10
+22  9  10
+
+Quantum           (20,40,80)  (10,20,30) (5,10,20)  (2,4,8) 
+Repeat processes      0           1          5         10
+
+*Repeat processes are how many times a process started running again
+
+We can see that when we increase the size of the quantums we start having a behaviour similar to the FCFS if the 
+maximum process job time approach the quantum of the first queue as all the process will enter the first queue and 
+finish their job before they exhaust the quantum.
+
+Now we reverse the order of the quantums.
+
+Example: 
+Quantum = (8, 4, 2)
+t pid jt1 jt2    
+0  4  15   15
+3  8  15    5
+5  2  15   10
+7  1  15    6
+8  3  15    2
+10 6  15    4
+
+Last processes to finish:
+jt1    jt2
+ 1      6 
+ 3      2 
+ 6      4 
+
+We notice that the algorithm starts starving process that take a lot of time to process and prioritising 
+the fast process because they wont drop to often in Q2 and Q3. Then the process with big job time will need to wait to 
+all the fast process to finish before they can occupy the CPU.
